@@ -1,0 +1,59 @@
+# Build output (Projucer)
+# Regenerated from the .jucer file, which IS committed.
+Builds/
+JuceLibraryCode/
+
+# Build output (CMake)
+build/
+cmake-build-*/
+out/
+
+# JUCE itself (link it as a submodule or let CMake fetch it instead)
+JUCE/
+
+# Compiled plugins and binaries
+*.vst3
+*.component
+*.aaxplugin
+*.exe
+*.dll
+*.lib
+*.pdb
+*.obj
+*.o
+*.a
+*.dylib
+*.app
+*.exp
+*.ilk
+*.res
+
+# Visual Studio intermediates and logs
+*.tlog/
+*.log
+*.ipch
+*.VC.db
+*.VC.opendb
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.xcodeproj/
+*.xcworkspace/
+*.sln
+*.vcxproj*
+*.user
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Audiosend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── FRUTIGER AERO — CSS VARIABLES ─────────────────────────────────────────── */
+:root {
+  --sky-top: #b8e4f8;
+  --sky-mid: #d8f0fa;
+  --sky-bot: #f0f9ff;
+  --glass:   rgba(255,255,255,0.60);
+  --glass2:  rgba(255,255,255,0.78);
+  --gloss:   rgba(255,255,255,0.92);
+  --border:  rgba(255,255,255,0.88);
+  --blue:    #0070b4;
+  --blue2:   #1898d8;
+  --blue3:   #60c0e8;
+  --blue4:   #b8dff5;
+  --teal:    #00a898;
+  --text:    #0e2d44;
+  --text2:   #2a5878;
+  --muted:   #6aaac8;
+  --green:   #009960;
+  --amber:   #d08010;
+  --red:     #c83050;
+  --sans:    'Nunito', 'Segoe UI', sans-serif;
+  --display: 'Rajdhani', 'Trebuchet MS', sans-serif;
+}
+
+/* ── RESET ──────────────────────────────────────────────────────────────────── */
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+/* ── BODY — sky gradient ────────────────────────────────────────────────────── */
+body {
+  min-height: 100dvh;
+  overscroll-behavior: none;
+  font-family: var(--sans);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 90% 45% at 15% 0%,   rgba(130,210,255,0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 35% at 85% 5%,   rgba(190,235,255,0.40) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 50% 100%,  rgba(200,240,255,0.30) 0%, transparent 60%),
+    linear-gradient(180deg, #b4d8f0 0%, #cce8f8 18%, #ddf2fb 40%, #edf9fe 65%, #f5fcff 100%);
+  position: relative;
+}
+
+/* ── DECORATIVE ORBS ────────────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; top: -70px; right: -50px;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%,
+    rgba(255,255,255,0.90) 0%,
+    rgba(140,215,255,0.55) 38%,
+    rgba(0,148,220,0.18)   68%,
+    transparent 100%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed; bottom: 18%; left: -55px;
+  width: 170px; height: 170px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%,
+    rgba(255,255,255,0.75) 0%,
+    rgba(170,230,255,0.45) 44%,
+    rgba(0,170,200,0.12)   70%,
+    transparent 100%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────────── */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 0;
+  position: relative; z-index: 2;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 21px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--blue);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.95), 0 0 24px rgba(0,130,220,0.25);
+}
+.logo span { color: var(--blue2); font-weight: 400; }
+
+.live-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #aaffee, #00d0a0);
+  box-shadow: 0 0 0 3px rgba(0,200,160,0.18), 0 0 9px rgba(0,200,160,0.45);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.65;transform:scale(0.82)} }
+
+/* ── SECTION LABEL ──────────────────────────────────────────────────────────── */
+.section-label {
+  font-family: var(--display);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.20em; text-transform: uppercase;
+  color: var(--blue2); padding: 22px 20px 8px;
+  position: relative; z-index: 2;
+}
+
+/* ── FOLDER FILTER BAR ──────────────────────────────────────────────────────── */
+.folder-bar {
+  padding: 0 12px 10px;
+  display: flex; gap: 7px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  position: relative; z-index: 2;
+}
+.folder-bar::-webkit-scrollbar { display: none; }
+
+.folder-chip {
+  flex-shrink: 0;
+  padding: 6px 16px; border-radius: 20px;
+  font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  cursor: pointer; white-space: nowrap;
+  border: 1px solid rgba(0,140,220,0.28);
+  background: rgba(255,255,255,0.62);
+  color: var(--blue2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 1px 4px rgba(0,100,180,0.08);
+  transition: all .15s;
+}
+.folder-chip.active {
+  background: linear-gradient(140deg, #2aaae8, #0070b4);
+  color: white; border-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 10px rgba(0,110,200,0.32);
+}
+.folder-chip.auto { border-color: rgba(0,170,160,0.35); color: var(--teal); }
+.folder-chip.auto.active {
+  background: linear-gradient(140deg, #00c4ae, #008880);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 10px rgba(0,140,130,0.28);
+}
+
+/* ── FILE LIST ──────────────────────────────────────────────────────────────── */
+.file-list {
+  padding: 0 12px; display: flex; flex-direction: column; gap: 6px;
+  position: relative; z-index: 2;
+}
+
+.file-item {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer; -webkit-user-select: none; user-select: none;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.97),
+    inset 0 -1px 0 rgba(0,90,160,0.06),
+    0 2px 10px rgba(0,90,160,0.08),
+    0 1px 2px rgba(0,70,130,0.05);
+  transition: transform .12s, box-shadow .12s;
+  position: relative; overflow: hidden;
+}
+/* Top gloss line */
+.file-item::before {
+  content: '';
+  position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.98), transparent);
+}
+.file-item:active { transform: scale(0.984); }
+.file-item.active {
+  background: rgba(210,240,255,0.78);
+  border-color: rgba(0,145,220,0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.97),
+    0 0 0 2px rgba(0,155,230,0.14),
+    0 4px 18px rgba(0,110,200,0.13);
+}
+
+.file-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(148deg, rgba(195,235,255,0.92), rgba(155,215,255,0.65));
+  border: 1px solid rgba(255,255,255,0.92);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,1), 0 2px 5px rgba(0,90,170,0.10);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-size: 9px; font-weight: 600;
+  color: var(--blue); letter-spacing: 0.04em;
+}
+
+.file-info { flex: 1; min-width: 0; }
+.file-name {
+  font-size: 13.5px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--text);
+}
+.file-meta { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+.folder-tag {
+  display: inline-block; font-family: var(--display);
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 2px 9px; border-radius: 10px;
+}
+.folder-tag.normal {
+  background: rgba(0,130,215,0.09); color: var(--blue2);
+  border: 0.5px solid rgba(0,130,215,0.22);
+}
+.folder-tag.auto {
+  background: rgba(0,170,160,0.10); color: var(--teal);
+  border: 0.5px solid rgba(0,170,160,0.28);
+}
+
+.file-chevron { width:16px; height:16px; opacity:0.38; flex-shrink:0; color:var(--blue2); }
+
+/* ── BOTTOM SHEET ────────────────────────────────────────────────────────────── */
+.sheet-overlay {
+  position: fixed; inset: 0; z-index: 10;
+  background: rgba(160,210,235,0.28);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.sheet-overlay.open { opacity: 1; pointer-events: auto; }
+
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: linear-gradient(180deg, rgba(232,250,255,0.97) 0%, rgba(255,255,255,0.99) 100%);
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.97);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 -10px 46px rgba(0,90,180,0.13),
+    0 -2px 10px rgba(0,110,200,0.07);
+  padding: 0 0 env(safe-area-inset-bottom, 16px);
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 88dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 40px; height: 4px; border-radius: 2px; margin: 12px auto 0;
+  background: linear-gradient(90deg, rgba(0,140,210,0.18), rgba(0,160,230,0.32), rgba(0,140,210,0.18));
+}
+.sheet-header {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid rgba(0,140,215,0.10);
+  background: linear-gradient(180deg, rgba(210,242,255,0.55), transparent);
+}
+.sheet-filename {
+  font-size: 16px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--text);
+}
+.sheet-timestamp { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ── PLAYER ─────────────────────────────────────────────────────────────────── */
+.player-section { padding: 16px 20px; border-bottom: 1px solid rgba(0,138,215,0.09); }
+
+.waveform-bar {
+  height: 44px; display: flex; align-items: center; gap: 2px;
+  margin-bottom: 12px; cursor: pointer;
+}
+.waveform-bar span {
+  flex: 1; border-radius: 3px;
+  background: linear-gradient(180deg, rgba(0,155,220,0.16), rgba(0,128,200,0.09));
+  transition: background 0.06s;
+}
+.waveform-bar span.played {
+  background: linear-gradient(180deg, #50c8f2, #0082cc);
+  box-shadow: 0 0 4px rgba(0,155,225,0.38);
+}
+
+audio { display: none; }
+
+.player-controls { display: flex; align-items: center; gap: 16px; }
+
+/* Aero gloss play button */
+.play-btn {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.92);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  background: linear-gradient(162deg, #58c4f0 0%, #1892d8 42%, #006eb8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -1px 0 rgba(0,55,115,0.30),
+    0 4px 14px rgba(0,95,180,0.38),
+    0 1px 3px rgba(0,75,155,0.20);
+  transition: transform .10s, box-shadow .10s;
+}
+/* Upper gloss half-circle */
+.play-btn::before {
+  content: '';
+  position: absolute; top: 2px; left: 18%; right: 18%; height: 42%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0));
+  border-radius: 50% 50% 0 0;
+}
+.play-btn:active {
+  transform: scale(0.91);
+  box-shadow: inset 0 2px 5px rgba(0,55,115,0.40), 0 2px 6px rgba(0,95,180,0.22);
+}
+.play-btn svg { width: 16px; height: 16px; fill: white; position: relative; z-index: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.22)); }
+
+.time-display {
+  font-size: 12px; color: var(--muted); flex: 1; text-align: right;
+  font-variant-numeric: tabular-nums; font-weight: 600;
+}
+
+/* Aero progress bar */
+.progress-track {
+  width: 100%; height: 6px; border-radius: 3px; margin-top: 10px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(0,115,200,0.11), rgba(0,135,210,0.06));
+  border: 1px solid rgba(0,138,220,0.14);
+  box-shadow: inset 0 1px 2px rgba(0,75,155,0.09);
+}
+.progress-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #58c8f2, #0086d0);
+  box-shadow: 0 0 7px rgba(0,155,225,0.48);
+  transition: width 0.1s linear;
+}
+
+/* Aero download button */
+.download-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px;
+  background: linear-gradient(180deg, rgba(238,250,255,0.92), rgba(208,238,255,0.86));
+  border: 1px solid rgba(0,158,222,0.28); border-radius: 14px;
+  color: var(--blue); font-family: var(--sans); font-size: 13px; font-weight: 700;
+  text-decoration: none; margin-top: 12px; letter-spacing: 0.02em; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.96), 0 2px 7px rgba(0,115,200,0.10);
+  transition: box-shadow .14s, background .14s;
+}
+.download-btn:active {
+  background: linear-gradient(180deg, rgba(208,238,255,0.92), rgba(178,220,255,0.86));
+  box-shadow: inset 0 1px 3px rgba(0,95,180,0.14);
+}
+
+/* ── ANALYSIS ────────────────────────────────────────────────────────────────── */
+.analysis-section { padding: 16px 20px; }
+.analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+
+.metric-card {
+  background: var(--glass2);
+  border: 1px solid rgba(255,255,255,0.88);
+  border-radius: 16px; padding: 14px 14px 12px;
+  position: relative; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,1), 0 2px 8px rgba(0,90,175,0.06);
+}
+.metric-card::before {
+  content: ''; position: absolute; top: 0; left: 14%; right: 14%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent);
+}
+.metric-card.wide { grid-column: span 2; }
+
+.metric-label {
+  font-family: var(--display); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.17em; text-transform: uppercase; color: var(--blue2); margin-bottom: 6px;
+}
+.metric-value {
+  font-family: var(--display); font-size: 24px; font-weight: 300;
+  line-height: 1; color: var(--text); letter-spacing: -0.01em;
+}
+.metric-value.good  { color: var(--green); }
+.metric-value.warn  { color: var(--amber); }
+.metric-value.bad   { color: var(--red); }
+.metric-value.accent { color: var(--blue); }
+
+.metric-sub { font-size: 10.5px; color: var(--muted); margin-top: 4px; font-weight: 400; line-height: 1.4; }
+
+.meter-track {
+  height: 5px; border-radius: 3px; margin-top: 8px; overflow: hidden;
+  background: rgba(0,115,200,0.08); border: 1px solid rgba(0,138,222,0.11);
+}
+.meter-fill { height: 100%; border-radius: 3px; transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
+
+.freq-bars { display: flex; align-items: flex-end; gap: 2px; height: 48px; margin-top: 8px; }
+.freq-bar {
+  flex: 1; border-radius: 3px 3px 0 0; min-height: 3px;
+  background: linear-gradient(180deg, #80d8f6, #0082cc);
+  box-shadow: 0 0 3px rgba(0,138,220,0.22);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--display); font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 3px 10px; border-radius: 20px; margin-top: 6px; border: 1px solid transparent;
+}
+.badge.green  { background: rgba(0,200,140,0.10); color: var(--green);  border-color: rgba(0,180,120,0.22); }
+.badge.amber  { background: rgba(215,155,0,0.10);  color: var(--amber);  border-color: rgba(200,140,0,0.22); }
+.badge.red    { background: rgba(205,55,75,0.09);   color: var(--red);    border-color: rgba(185,45,65,0.20); }
+.badge.blue   { background: rgba(0,134,218,0.10);   color: var(--blue);   border-color: rgba(0,134,218,0.22); }
+.badge-dot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+/* ── STATE BOXES ─────────────────────────────────────────────────────────────── */
+.state-box { padding: 60px 20px; text-align: center; position: relative; z-index: 2; }
+.state-box h2 {
+  font-family: var(--display); font-size: 17px; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--blue); margin-bottom: 8px;
+}
+.state-box p { font-size: 13px; line-height: 1.7; color: var(--muted); }
+
+/* ── REFRESH BAR ─────────────────────────────────────────────────────────────── */
+.refresh-bar {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  left: 12px; right: 12px; z-index: 5;
+  background: rgba(255,255,255,0.76);
+  border: 1px solid rgba(255,255,255,0.96); border-radius: 14px;
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: var(--muted);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.96),
+    0 4px 18px rgba(0,90,180,0.10),
+    0 1px 4px rgba(0,75,155,0.06);
+}
+.refresh-bar button {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  color: var(--blue);
+}
+
+/* ── SPINNER ─────────────────────────────────────────────────────────────────── */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(0,138,220,0.18); border-top-color: var(--blue2);
+  border-radius: 50%; animation: spin 0.78s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DEBUG BAR ───────────────────────────────────────────────────────────────── */
+#debugBar {
+  border-radius: 10px !important; font-family: var(--sans) !important; font-size: 11px !important;
+}
+
+/* ── GEAR BUTTON ─────────────────────────────────────────────────────────────── */
+.gear-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid rgba(0,140,220,0.28);
+  color: var(--blue2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 1px 4px rgba(0,100,180,0.08);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: background .15s, transform .1s;
+}
+.gear-btn:active { transform: scale(0.90); background: rgba(210,238,255,0.8); }
+
+/* ── SETTINGS SHEET ──────────────────────────────────────────────────────────── */
+.settings-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: linear-gradient(180deg, rgba(232,250,255,0.97) 0%, rgba(255,255,255,0.99) 100%);
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.97);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 -10px 46px rgba(0,90,180,0.13),
+    0 -2px 10px rgba(0,110,200,0.07);
+  padding: 0 0 env(safe-area-inset-bottom, 20px);
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.settings-sheet.open { transform: translateY(0); }
+
+.settings-handle {
+  width: 40px; height: 4px; border-radius: 2px; margin: 12px auto 8px;
+  background: linear-gradient(90deg, rgba(0,140,210,0.18), rgba(0,160,230,0.32), rgba(0,140,210,0.18));
+}
+.settings-title {
+  padding: 4px 20px 14px;
+  font-family: var(--display); font-size: 16px; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--text);
+  border-bottom: 1px solid rgba(0,140,215,0.10);
+  background: linear-gradient(180deg, rgba(210,242,255,0.55), transparent);
+}
+.settings-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 20px; }
+
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.setting-label {
+  font-size: 13px; font-weight: 700; color: var(--text); flex: 0 0 auto;
+}
+.setting-sublabel {
+  font-size: 11px; color: var(--muted); margin-top: 1px;
+}
+.setting-label-group { display: flex; flex-direction: column; }
+
+/* Aero-style range slider */
+.aero-range {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; height: 6px; border-radius: 3px; outline: none; cursor: pointer;
+  background: linear-gradient(180deg, rgba(0,115,200,0.11), rgba(0,135,210,0.06));
+  border: 1px solid rgba(0,138,220,0.14);
+}
+.aero-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: linear-gradient(145deg, #58c4f0, #006eb8);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,95,180,0.35), inset 0 1px 0 rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+/* Aero toggle switch */
+.aero-toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.aero-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.aero-toggle-track {
+  position: absolute; inset: 0; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(0,115,200,0.12), rgba(0,135,210,0.06));
+  border: 1px solid rgba(0,138,220,0.25);
+  transition: background .2s;
+}
+.aero-toggle input:checked + .aero-toggle-track {
+  background: linear-gradient(145deg, #2aaae8, #006eb8);
+  border-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 6px rgba(0,110,200,0.3);
+}
+.aero-toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(145deg, #fff, #ddeeff);
+  border: 0.5px solid rgba(0,100,180,0.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform .2s;
+  pointer-events: none;
+}
+.aero-toggle input:checked ~ .aero-toggle-thumb { transform: translateX(20px); }
+
+/* Value display badge */
+.setting-val {
+  font-family: var(--display); font-size: 13px; font-weight: 600;
+  color: var(--blue); min-width: 36px; text-align: right;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">Audio<span>send</span></span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="live-dot" id="liveDot"></div>
+    <button class="gear-btn" id="gearBtn" onclick="openSettings()" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M9 1v2M9 15v2M1 9h2M15 9h2M2.93 2.93l1.41 1.41M13.66 13.66l1.41 1.41M2.93 15.07l1.41-1.41M13.66 4.34l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="section-label">Exports</div>
+<div class="folder-bar" id="folderBar"></div>
+<div class="file-list" id="fileList">
+  <div class="state-box" style="padding:40px 20px">
+    <span class="spinner"></span>
+    <span style="font-size:13px;color:var(--muted)">Connecting...</span>
+  </div>
+</div>
+
+<div style="height:80px"></div>
+
+<div class="refresh-bar">
+  <span id="refreshLabel">Auto-refreshing every 5s</span>
+  <button onclick="loadFiles(true)">Refresh</button>
+</div>
+
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-filename" id="sheetFilename">—</div>
+    <div class="sheet-timestamp" id="sheetTimestamp">—</div>
+  </div>
+  <div class="player-section">
+    <audio id="audioEl" preload="metadata"></audio>
+    <div class="waveform-bar" id="waveformBar" onclick="seekFromWaveform(event)"></div>
+    <div class="player-controls">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">
+        <svg viewBox="0 0 16 16" id="playIcon"><polygon points="3,1 15,8 3,15"/></svg>
+      </button>
+      <div class="progress-track" onclick="seekFromBar(event)" style="flex:1">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+    </div>
+    <div id="debugBar" style="display:none;margin-top:10px;padding:8px 12px;
+      background:rgba(200,50,70,0.10);border:1px solid rgba(200,50,70,0.22);
+      border-radius:10px;font-size:11px;color:var(--red);word-break:break-all;line-height:1.5"></div>
+    <a class="download-btn" id="downloadBtn" href="#" download>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0">
+        <path d="M7 1v8M3 6l4 4 4-4M1 11h12v2H1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Save to Files
+    </a>
+  </div>
+  <div class="analysis-section">
+    <div class="section-label" style="padding:0 0 10px;font-size:9px">Analysis</div>
+    <div class="analysis-grid" id="analysisGrid"></div>
+  </div>
+</div>
+
+<script>
+/* ── State ── */
+let files = [];
+let activeId = null;
+let isPlaying = false;
+let currentAudioUrl = '';
+let activeFolder = 'All';
+
+/* ── Fetch from plugin ── */
+async function loadFiles(manual = false) {
+  if (manual) document.getElementById('refreshLabel').textContent = 'Refreshing...';
+  try {
+    const res = await fetch('/api/files', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    files = Array.isArray(data) ? data : [];
+    renderFolderBar();
+    renderFileList();
+    document.getElementById('refreshLabel').textContent =
+      'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('liveDot').style.background = 'radial-gradient(circle at 35% 28%, #aaffee, #00d0a0)';
+  } catch (e) {
+    document.getElementById('liveDot').style.background = '#e87070';
+    document.getElementById('refreshLabel').textContent = 'Connection lost — retrying...';
+    if (!files.length) {
+      document.getElementById('fileList').innerHTML = `<div class="state-box">
+        <h2>Cannot reach plugin</h2>
+        <p>Make sure your DAW is open<br>and you're on the same WiFi.</p>
+      </div>`;
+    }
+  }
+}
+
+/* ── Folder bar ── */
+function renderFolderBar() {
+  const bar = document.getElementById('folderBar');
+  const folders = ['All', ...new Set(files.map(f => f.folder || 'Uploads'))];
+  bar.innerHTML = folders.map(folder => {
+    const isAuto   = folder === 'Last Exports';
+    const isActive = activeFolder === folder;
+    return `<div class="folder-chip ${isActive?'active':''} ${isAuto?'auto':''}"
+      onclick="setFolder('${esc(folder)}')">${esc(folder)}</div>`;
+  }).join('');
+}
+
+function setFolder(folder) {
+  activeFolder = folder;
+  renderFolderBar();
+  renderFileList();
+}
+
+/* ── Render file list ── */
+function renderFileList() {
+  const el = document.getElementById('fileList');
+  const filtered = activeFolder === 'All' ? files
+    : files.filter(f => (f.folder || 'Uploads') === activeFolder);
+
+  if (!filtered.length) {
+    el.innerHTML = `<div class="state-box">
+      <h2>${files.length ? 'No files in this folder' : 'No exports yet'}</h2>
+      <p>${files.length
+        ? 'Switch folders above or drop a new file.'
+        : 'Drop an audio file onto the<br>SongSender plugin in your DAW.'}</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(f => {
+    const folderClass = f.autoWatch ? 'auto' : 'normal';
+    const icon = f.autoWatch ? '⚡ ' : '';
+    return `
+    <div class="file-item ${activeId === f.id ? 'active' : ''}" onclick="openFile('${esc(f.id)}')">
+      <div class="file-icon">${esc(f.ext || 'AUD')}</div>
+      <div class="file-info">
+        <div class="file-name">${esc(f.name)}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+          <span class="folder-tag ${folderClass}">${icon}${esc(f.folder||'Uploads')}</span>
+          <span class="file-meta">${fmtAgo(f.timestamp)} · ${esc(f.size||'')}</span>
+        </div>
+      </div>
+      <svg class="file-chevron" viewBox="0 0 16 16" fill="none">
+        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>`;
+  }).join('');
+}
+
+/* ── Open sheet ── */
+function openFile(id) {
+  const f = files.find(x => x.id === id);
+  if (!f) return;
+  activeId = id;
+  renderFileList();
+
+  document.getElementById('sheetFilename').textContent = f.name;
+  document.getElementById('sheetTimestamp').textContent = fmtTimestamp(f.timestamp);
+
+  const audio = document.getElementById('audioEl');
+  audio.pause();
+  resetPlayer();
+  dbg('');
+
+  currentAudioUrl = f.url || '/audio/' + f.id;
+  audio.src = currentAudioUrl;
+
+  const dl = document.getElementById('downloadBtn');
+  dl.href = f.dlUrl || '/dl/' + f.id;
+  dl.download = f.name;
+
+  renderWaveform();
+  renderAnalysis(f.analysis || f);
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  document.body.style.overflow = '';
+  const audio = document.getElementById('audioEl');
+  audio.pause();
+  audio.src = '';
+  isPlaying = false;
+  updatePlayIcon();
+}
+
+/* ── Player ── */
+function resetPlayer() {
+  isPlaying = false; updatePlayIcon();
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('timeDisplay').textContent = '0:00 / 0:00';
+}
+
+function togglePlay() {
+  const a = document.getElementById('audioEl');
+  if (isPlaying) { a.pause(); return; }
+  if (!a.src || a.src === window.location.href) a.src = currentAudioUrl;
+  dbg('');
+  // Initialise Web Audio on first gesture (required by iOS Safari)
+  ensureAudioCtx();
+  // Apply mono routing if it was set before context existed
+  if (isMono && audioCtx && gainNode) rebuildMonoRouting();
+  const p = a.play();
+  if (p !== undefined) {
+    p.then(() => { dbg(''); })
+     .catch(err => {
+       isPlaying = false; updatePlayIcon();
+       dbg('ERR ' + err.name + ': ' + err.message);
+     });
+  } else {
+    isPlaying = true; updatePlayIcon();
+  }
+}
+
+function updatePlayIcon() {
+  document.getElementById('playIcon').innerHTML = isPlaying
+    ? '<rect x="3" y="1" width="4" height="14" rx="1"/><rect x="9" y="1" width="4" height="14" rx="1"/>'
+    : '<polygon points="3,1 15,8 3,15"/>';
+}
+
+function dbg(msg) {
+  const el = document.getElementById('debugBar');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+const audioEl = document.getElementById('audioEl');
+audioEl.addEventListener('play',  () => { isPlaying = true;  updatePlayIcon(); });
+audioEl.addEventListener('pause', () => { isPlaying = false; updatePlayIcon(); });
+audioEl.addEventListener('ended', () => {
+  isPlaying = false; updatePlayIcon();
+  document.getElementById('progressFill').style.width = '0%';
+});
+audioEl.addEventListener('loadedmetadata', () => {
+  const dur = audioEl.duration;
+  if (dur && isFinite(dur))
+    document.getElementById('timeDisplay').textContent = '0:00 / ' + fmtTime(dur);
+  dbg('');
+});
+audioEl.addEventListener('timeupdate', () => {
+  const dur = audioEl.duration;
+  if (!dur || !isFinite(dur)) return;
+  const p = audioEl.currentTime / dur;
+  document.getElementById('progressFill').style.width = (p * 100) + '%';
+  document.getElementById('timeDisplay').textContent =
+    fmtTime(audioEl.currentTime) + ' / ' + fmtTime(dur);
+  updateWaveProgress(p);
+});
+audioEl.addEventListener('error', () => {
+  const err = audioEl.error;
+  const codes = ['', 'ABORTED', 'NETWORK', 'DECODE', 'SRC_NOT_SUPPORTED'];
+  dbg('Media error ' + (err ? codes[err.code] || err.code : '?') +
+      (err && err.message ? ': ' + err.message : ''));
+});
+
+function seekFromBar(e) {
+  if (!audioEl.duration) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  audioEl.currentTime = ((e.clientX - r.left) / r.width) * audioEl.duration;
+}
+function seekFromWaveform(e) { seekFromBar(e); }
+
+/* ── Waveform ── */
+function renderWaveform() {
+  document.getElementById('waveformBar').innerHTML = Array.from({length:48}, (_,i) => {
+    const h = Math.round(Math.abs(Math.sin(i*1.7+0.5)*Math.cos(i*0.4))*36+4);
+    return `<span data-i="${i}" style="height:${h}px"></span>`;
+  }).join('');
+}
+function updateWaveProgress(p) {
+  const spans = document.querySelectorAll('#waveformBar span');
+  const cut = Math.floor(p * spans.length);
+  spans.forEach((s,i) => s.classList.toggle('played', i < cut));
+}
+
+/* ── Analysis cards ── */
+function renderAnalysis(a) {
+  const grid = document.getElementById('analysisGrid');
+  if (!a || typeof a.lufs === 'undefined') {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:12px;padding:8px 0;grid-column:span 2">Analysis data unavailable</p>';
+    return;
+  }
+  const lufsC = a.lufs >= -9 ? 'bad' : a.lufs >= -14 ? 'warn' : 'good';
+  const tpC   = a.truePeak > 0 ? 'bad' : a.truePeak > -1 ? 'warn' : 'good';
+  const drC   = a.dynamicRange < 4 ? 'bad' : a.dynamicRange < 7 ? 'warn' : 'good';
+  const phC   = a.phaseCorrelation < 0.3 ? 'bad' : a.phaseCorrelation < 0.6 ? 'warn' : 'good';
+  const fmax  = a.freqBalance ? Math.max(...a.freqBalance, 1) : 1;
+  const fbars = (a.freqBalance||[]).map(v =>
+    `<div class="freq-bar" style="height:${Math.round((v/fmax)*44)}px"></div>`).join('');
+  const flabels = ['32','63','125','250','500','1k','2k','4k','8k','16k'];
+
+  grid.innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Integrated LUFS</div>
+      <div class="metric-value ${lufsC}">${(+a.lufs).toFixed(1)}</div>
+      <div class="metric-sub">Short-term: ${a.shortTermLufs?(+a.shortTermLufs).toFixed(1):'—'} · Target −14</div>
+      <div class="meter-track"><div class="meter-fill" style="width:${Math.min(100,Math.round((+a.lufs+30)/30*100))}%;background:${lufsC==='good'?'var(--green)':lufsC==='warn'?'var(--amber)':'var(--red)'}"></div></div>
+      <span class="badge ${lufsC==='good'?'green':lufsC==='warn'?'amber':'red'}"><span class="badge-dot"></span>${+a.lufs>=-9?'Hot — reduce gain':+a.lufs>=-14?'Slightly loud':+a.lufs>=-18?'Streaming safe':'Quiet'}</span>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">True Peak</div>
+      <div class="metric-value ${tpC}">${+a.truePeak>0?'+':''}${(+a.truePeak).toFixed(1)} dBTP</div>
+      <div class="metric-sub">Limit: −1.0 dBTP</div>
+      <span class="badge ${tpC==='good'?'green':tpC==='warn'?'amber':'red'}"><span class="badge-dot"></span>${+a.truePeak>0?'Clipping':+a.truePeak>-1?'Near limit':'Safe'}</span>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Dynamic Range</div>
+      <div class="metric-value ${drC}">${(+a.dynamicRange).toFixed(1)} LU</div>
+      <div class="metric-sub">DR score</div>
+      <span class="badge ${drC==='good'?'green':drC==='warn'?'amber':'red'}"><span class="badge-dot"></span>${+a.dynamicRange<4?'Crushed':+a.dynamicRange<7?'Compressed':'Natural'}</span>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Limiting / Clipping</div>
+      ${a.clipping
+        ? `<div class="metric-value bad">${a.clippingCount} clips</div><span class="badge red"><span class="badge-dot"></span>Digital clipping</span>`
+        : a.limiting
+        ? `<div class="metric-value warn">−${(+a.limitingAmount).toFixed(1)} dB</div><span class="badge amber"><span class="badge-dot"></span>Limiter active</span>`
+        : `<div class="metric-value good">None</div><span class="badge green"><span class="badge-dot"></span>Headroom OK</span>`}
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Stereo Width</div>
+      <div class="metric-value accent">${Math.round(+a.stereoWidth)}%</div>
+      <div class="meter-track"><div class="meter-fill" style="width:${Math.round(+a.stereoWidth)}%;background:var(--blue2)"></div></div>
+      <div class="metric-sub">${+a.stereoWidth<20?'Near mono':+a.stereoWidth>85?'Very wide':'Healthy width'}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Phase Correlation</div>
+      <div class="metric-value ${phC}">${(+a.phaseCorrelation).toFixed(2)}</div>
+      <div class="metric-sub">−1 wide → +1 mono</div>
+      <span class="badge ${phC==='good'?'green':phC==='warn'?'amber':'red'}"><span class="badge-dot"></span>${+a.phaseCorrelation<0.3?'Phase issues':+a.phaseCorrelation<0.6?'Slightly wide':'Mono compat'}</span>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">L / R RMS</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;margin-top:4px">
+        <div><div class="metric-sub">L</div><div class="metric-value" style="font-size:18px">${(+a.rmsLeft).toFixed(1)}</div></div>
+        <div style="color:var(--blue4);font-size:18px;padding-bottom:2px">/</div>
+        <div><div class="metric-sub">R</div><div class="metric-value" style="font-size:18px">${(+a.rmsRight).toFixed(1)}</div></div>
+        <div class="metric-sub" style="padding-bottom:3px">dBFS</div>
+      </div>
+      <span class="badge ${Math.abs(+a.rmsLeft - +a.rmsRight)<0.5?'green':'amber'}"><span class="badge-dot"></span>${Math.abs(+a.rmsLeft - +a.rmsRight)<0.5?'Balanced':Math.abs(+a.rmsLeft - +a.rmsRight).toFixed(1)+' dB offset'}</span>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">DC Offset</div>
+      <div class="metric-value ${+a.dcOffset>0.01?'warn':'good'}">${((+a.dcOffset)*100).toFixed(2)}%</div>
+      <span class="badge ${+a.dcOffset>0.01?'amber':'green'}"><span class="badge-dot"></span>${+a.dcOffset>0.01?'Remove with HPF':'No issue'}</span>
+    </div>
+    <div class="metric-card wide">
+      <div class="metric-label">File Info</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:4px">
+        <div><div class="metric-sub">Sample Rate</div><div style="font-family:var(--display);font-size:15px;color:var(--text);margin-top:2px">${(+a.sampleRate/1000).toFixed(1)} kHz</div></div>
+        <div><div class="metric-sub">Bit Depth</div><div style="font-family:var(--display);font-size:15px;color:var(--text);margin-top:2px">${a.bitDepth}-bit</div></div>
+        <div><div class="metric-sub">Duration</div><div style="font-family:var(--display);font-size:15px;color:var(--text);margin-top:2px">${fmtTime(+a.duration)}</div></div>
+        <div><div class="metric-sub">Transients</div><div style="font-family:var(--display);font-size:15px;color:var(--text);margin-top:2px">${a.transientDensity||'—'}</div></div>
+      </div>
+    </div>
+    ${fbars ? `<div class="metric-card wide">
+      <div class="metric-label">Spectral Balance</div>
+      <div class="freq-bars">${fbars}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        ${flabels.map(l=>`<span style="font-family:var(--display);font-size:8px;color:var(--muted)">${l}</span>`).join('')}
+        <span style="font-family:var(--display);font-size:8px;color:var(--muted)">Hz/kHz</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <span class="badge blue"><span class="badge-dot"></span>Bass: ${a.bassEnergy||'—'}</span>
+        <span class="badge blue"><span class="badge-dot"></span>Mids: ${a.midEnergy||'—'}</span>
+        <span class="badge blue"><span class="badge-dot"></span>Highs: ${a.highEnergy||'—'}</span>
+      </div>
+    </div>` : ''}`;
+}
+
+/* ── Utils ── */
+function fmtTime(s) { if(!s||isNaN(s)) return '0:00'; s=Math.round(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function fmtAgo(ts) { const m=Math.floor((Date.now()-ts)/60000); if(m<1) return 'just now'; if(m<60) return m+'m ago'; return Math.floor(m/60)+'h ago'; }
+function fmtTimestamp(ts) { return new Date(ts).toLocaleString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+/* ── Web Audio API setup ──────────────────────────────────────────────────────
+   Created lazily on first user gesture (required by iOS Safari).
+   Graph: audioEl → sourceNode → gainNode → splitterNode → mergerNode → destination
+   The merger/splitter pair is only needed for mono summing.
+   When not in mono mode the signal goes: sourceNode → gainNode → destination.
+   We rebuild the graph when switching mono mode to avoid routing complexity.
+*/
+let audioCtx     = null;
+let sourceNode   = null;
+let gainNode     = null;
+let monoMerger   = null;
+let isMono       = false;
+let currentVol   = 1.0;  // 0–2 linear
+let autoRefreshId = null;
+
+function ensureAudioCtx() {
+  if (audioCtx) {
+    // iOS suspends AudioContext if no interaction for a while
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;  // fallback: no Web Audio
+
+  audioCtx = new AudioContext();
+  const audio = document.getElementById('audioEl');
+
+  // sourceNode can only be created once per audio element per context
+  sourceNode = audioCtx.createMediaElementSource(audio);
+  gainNode   = audioCtx.createGain();
+  gainNode.gain.value = currentVol;
+
+  // Default routing: source → gain → destination
+  sourceNode.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+}
+
+function rebuildMonoRouting() {
+  if (!audioCtx || !sourceNode || !gainNode) return;
+
+  // Disconnect everything
+  try { gainNode.disconnect(); } catch(e) {}
+  try { if (monoMerger) monoMerger.disconnect(); } catch(e) {}
+  monoMerger = null;
+
+  if (isMono) {
+    // Sum L+R to mono: splitter → merger (both channels to L+R)
+    const splitter = audioCtx.createChannelSplitter(2);
+    monoMerger     = audioCtx.createChannelMerger(2);
+    gainNode.connect(splitter);
+    splitter.connect(monoMerger, 0, 0);  // L → L
+    splitter.connect(monoMerger, 0, 1);  // L → R  (sum to mono)
+    splitter.connect(monoMerger, 1, 0);  // R → L
+    splitter.connect(monoMerger, 1, 1);  // R → R
+    monoMerger.connect(audioCtx.destination);
+  } else {
+    gainNode.connect(audioCtx.destination);
+  }
+}
+
+/* ── Settings: open / close ── */
+function openSettings() {
+  document.getElementById('settingsSheet').classList.add('open');
+  document.getElementById('settingsOverlay').classList.add('open');
+  // Prevent song sheet overlay from receiving clicks while settings is open
+  const songOverlay = document.getElementById('overlay');
+  if (songOverlay) songOverlay.style.pointerEvents = 'none';
+}
+function closeSettings() {
+  document.getElementById('settingsSheet').classList.remove('open');
+  document.getElementById('settingsOverlay').classList.remove('open');
+  // Restore song sheet overlay pointer events
+  const songOverlay = document.getElementById('overlay');
+  if (songOverlay) songOverlay.style.pointerEvents = '';
+  // NOTE: audio keeps playing — we never touch the audio element here
+}
+
+/* ── Settings: volume ── */
+function setVolume(val) {
+  currentVol = val / 100;
+  document.getElementById('volVal').textContent = val + '%';
+  if (gainNode) gainNode.gain.value = currentVol;
+  // Note: once AudioContext is created, audio.volume is bypassed by the Web Audio graph.
+  // We keep audio.volume at 1.0 so the gainNode has full control.
+  // On devices without Web Audio support, we fall back to audio.volume (capped at 1).
+  const audio = document.getElementById('audioEl');
+  if (!audioCtx) audio.volume = Math.min(1.0, currentVol);
+}
+
+/* ── Settings: speed ── */
+function setSpeed(val) {
+  const rate = val / 100;
+  document.getElementById('speedVal').textContent = rate.toFixed(1) + '×';
+  const audio = document.getElementById('audioEl');
+  audio.playbackRate = rate;
+  audio.defaultPlaybackRate = rate;
+}
+
+/* ── Settings: mono ── */
+function setMono(checked) {
+  isMono = checked;
+  if (audioCtx) rebuildMonoRouting();
+  // If audio context not yet created, flag will be applied on next play
+}
+
+/* ── Settings: loop ── */
+function setLoop(checked) {
+  document.getElementById('audioEl').loop = checked;
+}
+
+/* ── Settings: auto-refresh ── */
+function setAutoRefresh(checked) {
+  if (autoRefreshId) { clearInterval(autoRefreshId); autoRefreshId = null; }
+  if (checked) autoRefreshId = setInterval(loadFiles, 5000);
+}
+
+/* ── Boot ── */
+loadFiles();
+autoRefreshId = setInterval(loadFiles, 5000);
+</script>
+
+<!-- Settings overlay -->
+<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="settings-sheet" id="settingsSheet">
+  <div class="settings-handle"></div>
+  <div class="settings-title">Settings</div>
+  <div class="settings-body">
+
+    <!-- Volume -->
+    <div>
+      <div class="setting-row">
+        <div class="setting-label-group">
+          <span class="setting-label">Volume</span>
+          <span class="setting-sublabel">Boost or cut playback level</span>
+        </div>
+        <span class="setting-val" id="volVal">100%</span>
+      </div>
+      <div class="setting-row" style="margin-top:8px">
+        <input type="range" class="aero-range" id="volSlider" min="0" max="200" value="100" step="1"
+          oninput="setVolume(this.value)">
+      </div>
+    </div>
+
+    <!-- Speed -->
+    <div>
+      <div class="setting-row">
+        <div class="setting-label-group">
+          <span class="setting-label">Playback Speed</span>
+          <span class="setting-sublabel">Useful for reference checking</span>
+        </div>
+        <span class="setting-val" id="speedVal">1.0×</span>
+      </div>
+      <div class="setting-row" style="margin-top:8px">
+        <input type="range" class="aero-range" id="speedSlider" min="50" max="200" value="100" step="5"
+          oninput="setSpeed(this.value)">
+      </div>
+    </div>
+
+    <!-- Mono -->
+    <div class="setting-row">
+      <div class="setting-label-group">
+        <span class="setting-label">Mono</span>
+        <span class="setting-sublabel">Check mono compatibility</span>
+      </div>
+      <label class="aero-toggle">
+        <input type="checkbox" id="monoToggle" onchange="setMono(this.checked)">
+        <div class="aero-toggle-track"></div>
+        <div class="aero-toggle-thumb"></div>
+      </label>
+    </div>
+
+    <!-- Loop -->
+    <div class="setting-row">
+      <div class="setting-label-group">
+        <span class="setting-label">Loop</span>
+        <span class="setting-sublabel">Repeat current file</span>
+      </div>
+      <label class="aero-toggle">
+        <input type="checkbox" id="loopToggle" onchange="setLoop(this.checked)">
+        <div class="aero-toggle-track"></div>
+        <div class="aero-toggle-thumb"></div>
+      </label>
+    </div>
+
+    <!-- Auto-refresh -->
+    <div class="setting-row">
+      <div class="setting-label-group">
+        <span class="setting-label">Auto-refresh</span>
+        <span class="setting-sublabel">Check for new files every 5s</span>
+      </div>
+      <label class="aero-toggle">
+        <input type="checkbox" id="autoRefreshToggle" checked onchange="setAutoRefresh(this.checked)">
+        <div class="aero-toggle-track"></div>
+        <div class="aero-toggle-thumb"></div>
+      </label>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
