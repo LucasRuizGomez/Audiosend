@@ -4,7 +4,18 @@ A VST3 plugin that serves your audio exports to your phone over local Wi-Fi, so 
 
 **Website:** https://lukeda.me/audiosend/
 
-![AudioSend in FL Studio](docs/plugin.png)
+![AudioSend in FL Studio: file list with loudness badges and mix analysis](docs/audiosend1.PNG)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/audiosend2.PNG" alt="Sender tab: QR code to connect the phone and the Last Exports watch folder"></td>
+    <td width="50%"><img src="docs/audiosend3.PNG" alt="Settings tab: server port, default folder tag, max files and display options"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Sender:</b> scan the QR code with your phone</td>
+    <td align="center"><b>Settings:</b> port, file limit and display options</td>
+  </tr>
+</table>
 
 ## Features
 
@@ -65,7 +76,8 @@ For usage (connecting the phone, watch folder, tags, settings) see [docs/SETUP_G
 ```
 Audiosend.jucer              Projucer project (generates Builds/ and JuceLibraryCode/)
 docs/
-└── SETUP_GUIDE.md           User guide
+├── SETUP_GUIDE.md           User guide
+└── audiosend1-3.PNG         Screenshots
 Source/
 ├── PluginProcessor.h/.cpp   Plugin core: file list, watch folder, HTTP server, saved state
 ├── PluginEditor.h/.cpp      Plugin window: drop zone, file list, QR code, analysis panel, settings
